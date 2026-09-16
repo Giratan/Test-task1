@@ -21,9 +21,7 @@ import { pollUntil } from '../utils/poll';
 import Button from './ui/Button';
 
 function uid() {
-  // use crypto when available
   try {
-    // @ts-ignore
     return typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
       : String(Date.now());
@@ -105,7 +103,6 @@ export default function Checkout() {
 
   const getQuote = useCallback(async () => {
     if (!cart) return;
-    // validate basic fields before quote
     const errs: Record<string, string> = {};
     if (!customer.name || customer.name.trim().length < 2)
       errs.name = 'Укажите имя (не менее 2 символов)';
@@ -139,7 +136,6 @@ export default function Checkout() {
 
   const createOrder = useCallback(async () => {
     if (!quote) return;
-    // validate again before order
     const errs: Record<string, string> = {};
     if (!customer.name || customer.name.trim().length < 2) errs.name = 'Укажите имя (не менее 2 символов)';
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(customer.email)) errs.email = 'Некорректный email';
@@ -194,7 +190,6 @@ export default function Checkout() {
       setLoading(true);
       try {
         await api.postPaymentSimulation(payment.id, { scenario: s });
-        // after simulation is started, poll until final status
         const controller = new AbortController();
         pollController.current?.abort();
         pollController.current = controller;
@@ -217,7 +212,6 @@ export default function Checkout() {
     [applyPaymentResult, payment, refresh],
   );
 
-  // resume polling on mount if active payment stored
   useEffect(() => {
     const active = getActivePaymentId();
     if (active) {
@@ -227,7 +221,6 @@ export default function Checkout() {
           const restoredOrder = await api.getOrder(current.orderId);
           setOrder(restoredOrder);
           if (!['succeeded', 'failed', 'cancelled'].includes(current.status)) {
-            // start background polling using util
             const controller = new AbortController();
             pollController.current = controller;
             pollUntil(
