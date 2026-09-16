@@ -18,9 +18,7 @@ export function setToken(token: string | null) {
   try {
     if (token) localStorage.setItem(STORAGE_KEY, token);
     else localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // ignore
-  }
+  } catch {}
 }
 
 const PAYMENT_KEY = 'checkout:activePayment';
@@ -112,7 +110,6 @@ export async function request<T = unknown>(path: string, opts: RequestOptions = 
     return (parsed?.data ?? parsed) as T;
   }
 
-  // unify error shape and include meta.requestId from headers if missing
   const headerRequestId = res.headers.get('X-Request-Id') || '';
   const apiErr = (parsed as ApiError | null) || null;
   if (apiErr) {
