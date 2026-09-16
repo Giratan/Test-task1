@@ -17,7 +17,7 @@ function AppContent() {
     (async () => {
       setLoading(true);
       try {
-        // ensure session exists
+        
         await api.ensureSession();
         const res = await api.getProducts();
         if (mounted) setProducts(res);
